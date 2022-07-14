@@ -10,6 +10,7 @@
     <title>Timeline Service</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
 
     <style>
@@ -83,7 +84,7 @@
 
         .header p {
             margin: 40px auto;
-            width: 217px;
+            width: 250px;
             height: 48px;
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 16px;
@@ -94,6 +95,31 @@
             letter-spacing: -1.12px;
             text-align: center;
             color: #ffffff;
+        }
+
+        #title{
+            width: 502px !important;
+            height: 16px;
+            border-radius: 5px;
+            background-color: #ffffff;
+            border: none;
+            padding: 18px;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        #title::placeholder{
+            width: 216px;
+            height: 16px;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 13px;
+            font-weight: normal;
+            font-stretch: normal;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: -0.96px;
+            text-align: left;
+            color: #868e96;
         }
 
         textarea.field {
@@ -208,6 +234,20 @@
             margin-top: 12px;
         }
 
+        #logout-text{
+            width: 216px;
+            height: 16px;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            font-stretch: normal;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: -0.96px;
+            text-align: left;
+            color:#f8d7da;
+        }
+
 
     </style>
     <script>
@@ -225,25 +265,10 @@
             return true;
         }
 
-        // 익명의 username을 만듭니다.
-        function genRandomName(length) {
-            let result = '';
-            let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let charactersLength = characters.length;
-            for (let i = 0; i < length; i++) {
-                let number = Math.random() * charactersLength;
-                let index = Math.floor(number);
-                result += characters.charAt(index);
-            }
-            return result;
-        }
-
         // 수정 버튼을 눌렀을 때, 기존 작성 내용을 textarea 에 전달합니다.
         // 숨길 버튼을 숨기고, 나타낼 버튼을 나타냅니다.
         function editPost(id) {
             showEdits(id);
-            let contents = $(`#${id}-contents`).text().trim();
-            $(`#${id}-textarea`).val(contents);
         }
 
         function showEdits(id) {
@@ -268,6 +293,16 @@
         // 여기서부터 코드를 작성해주시면 됩니다.
 
         $(document).ready(function () {
+            if ($.cookie('token')) {
+                $.ajaxSetup({
+                    headers:{
+                        'Authorization': $.cookie('token')
+                    }
+                })
+
+            } else {
+                window.location.href = '/user/loginView';
+            }
             // HTML 문서를 로드할 때마다 실행합니다.
             getMessages();
         })
@@ -283,7 +318,6 @@
                 type: "GET",
                 url: `/api/memos/${id}`,
                 success: function (response){
-                    console.log(response);
                     let memo = response;
                     let id = memo.id;
                     let title = memo.title;
@@ -320,15 +354,15 @@
                                     </div>
                                     <div id="${id}-editarea" class="edit">
                                         <textarea id="${id}-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
-
                                     </div>
                                 </div>
                                 <!-- 버튼 영역-->
                                 <div class="footer">
-                                    <button id="${id}-read" value="조회하기" onclick="getMessage('${id}')"></button>
-                                    <img id="${id}-edit" class="icon-start-edit" src="images/edit.png" alt="" onclick="editPost('${id}')">
-                                    <img id="${id}-delete" class="icon-delete" src="images/delete.png" alt="" onclick="deleteOne('${id}')">
-                                    <img id="${id}-submit" class="icon-end-edit" src="images/done.png" alt="" onclick="submitEdit('${id}')">
+
+                              <!--     <button id="${id}-read" value="조회하기" onclick="getMessage('${id}')"></button> -->
+                                    <img id="${id}-edit" class="icon-start-edit" src="/images/edit.png" alt="" onclick="editPost('${id}')">
+                                    <img id="${id}-delete" class="icon-delete" src="/images/delete.png" alt="" onclick="deleteOne('${id}')">
+                                    <img id="${id}-submit" class="icon-end-edit" src="/images/done.png" alt="" onclick="submitEdit('${id}')">
 
                                 </div>
                             </div>`;
@@ -348,9 +382,9 @@
                 type: 'GET',
                 url: '/api/memos',
                 success: function (response) {
+                    console.log(response)
                     $('#cards-box').empty();
                     for(let i=0; i<response.length; i++){
-                        console.log(response)
                         let memo = response[i];
                         let id = memo.id;
                         let title = memo.title;
@@ -399,11 +433,11 @@
                                 </div>
                                 <!-- 버튼 영역-->
                                 <div class="footer">
-                                    <button id="${id}-read" value="조회하기" onclick="getMessage('${id}')"></button>
-                                    <img id="${id}-edit" class="icon-start-edit" src="images/edit.png" alt="" onclick="editPost('${id}')">
-                                    <img id="${id}-delete" class="icon-delete" src="images/delete.png" alt="" onclick="deleteOne('${id}')">
-                                    <img id="${id}-submit" class="icon-end-edit" src="images/done.png" alt="" onclick="submitEdit('${id}')">
-                                    <input type="text" id="${id}-textarea2"  class="te-edit" name="" >
+                                  <!--     <button id="${id}-read" value="조회하기" onclick="getMessage('${id}')"></button> -->
+                                    <img id="${id}-edit" class="icon-start-edit" src="/images/edit.png" alt="" onclick="editPost('${id}')">
+                                    <img id="${id}-delete" class="icon-delete" src="/images/delete.png" alt="" onclick="deleteOne('${id}')">
+                                    <img id="${id}-submit" class="icon-end-edit" src="/images/done.png" alt="" onclick="submitEdit('${id}')">
+
                                 </div>
                             </div>`;
             // 2. #cards-box 에 HTML을 붙인다.
@@ -423,7 +457,7 @@
             }
             // 3. genRandomName 함수를 통해 익명의 username을 만듭니다
             // 4. 전달할 data JSON으로 만듭니다.
-            let data = {'title': title, 'writer': writer, 'password':password, 'contents': contents};
+            let data = {'title':title, 'contents': contents};
             // 5. POST /api/memos 에 data를 전달합니다.
             $.ajax({
                 type: "POST",
@@ -431,6 +465,7 @@
                 contentType: "application/json", // JSON 형식으로 전달함을 알리기
                 data: JSON.stringify(data),
                 success: function (response) {
+                    console.log(response)
                     alert('메시지가 성공적으로 작성되었습니다.');
                     window.location.reload();
                 }
@@ -440,73 +475,34 @@
         // 메모를 수정합니다.
 
         function submitEdit(id) {
-            let inputpassword = $(`#${id}-textarea2`).val();
-            //먼저 비번이 같은지 확인한다.
+            let contents = $(`#${id}-textarea`).val();
+            let title = $(`#${id}-title`).text().trim();
+
+            let data = {'title':title, 'contents': contents};
+            //PUT /api/memos/{id} 에 data를 전달합니다.
             $.ajax({
-                type: "GET",
+                type: "PUT",
                 url: `/api/memos/${id}`,
-                success: function(response){
-                    let password = $(`#${id}-password`).text().trim();
-
-                    if(inputpassword == password){
-
-                        // 1. 작성 대상 메모의 username과 contents 를
-                        // 확인합니다.
-                        let writer = $(`#${id}-writer`).text().trim();   // 읽기모드(텍스트가 박혀있는)는 .val()이 아닌 .text로 가져온다.
-                        let contents = $(`#${id}-textarea`).val().trim();
-                        let password = $(`#${id}-password`).text().trim();
-                        let title = $(`#${id}-title`).text().trim();
-                        // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
-
-                        // 3. 전달할 data JSON으로 만듭니다.
-                        let data = {'password': password, 'title':title, 'writer': writer, 'contents': contents };
-                        // 4. PUT /api/memos/{id} 에 data를 전달합니다.
-                        $.ajax({
-                            type: "PUT",
-                            url: `/api/memos/${id}`,
-                            contentType: "application/json",
-                            data: JSON.stringify(data),
-                            success: function (response) {
-                                alert('메시지 변경에 성공하였습니다.');
-                                window.location.reload();
-                            }
-                        });
-
-                    }
-                    else{
-
-                        return alert("비번이 다릅니다.");
-                    }
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    console.log(response);
+                    alert('본인의 글일때만 수정됩니다.')
+                    window.location.reload();
                 }
-            })
+            });
+
         }
 
-        // 메모를 삭제합니다.
+        //메모를 삭제합니다.
         function deleteOne(id) {
 
-            let inputpassword = $(`#${id}-textarea2`).val();
-            //먼저 비번이 같은지 확인한다.
-            $.ajax({
-                type: "GET",
-                url: `/api/memos/${id}`,
-                success: function(response){
-                    let password = $(`#${id}-password`).text().trim();
-
-                    if(inputpassword == password){
-                        $.ajax({
-                            type: 'DELETE',
-                            url: `/api/memos/${id}`,
-                            success: function(){
-                                alert('삭제가 완료되었습니다.');
-                                window.location.reload();
-                            }
-                        })
-                    }
-                    else{
-
-                        return alert("비번이 다릅니다.")
-                    }
-
+                $.ajax({
+                    type: 'DELETE',
+                    url: `/api/memos/${id}`,
+                    success: function () {
+                        alert('삭제가 완료되었습니다.');
+                        window.location.reload();
                     }
                 })
 
@@ -525,18 +521,22 @@
     <div class="header">
         <h2>Timeline Service</h2>
         <p>
-            공유하고 싶은 소식을 입력해주세요.
-            24시간이 지난 뒤에는 사라집니다.
+            <span th:text="${username}"></span></br>
+            님의 공유하고 싶은 소식을 입력해주세요.
+            24시간이 지나면 사라집니다.</br>
         </p>
     </div>
+    <form id="my_form" method="post" action="/user/logout">
+        <a id="logout-text" href="javascript:{}" onclick="document.getElementById('my_form').submit();">로그아웃</a>
+    </form>
     <div class="area-write">
-        <input type="text" placeholder="제목을 입력해주세요" name="title" id="title">
-        <input type="text" placeholder="작성자를 입력해주세요" name="writer" id="writer">
-        <input type="text" placeholder="비밀번호를 입력해주세요" name="password" id="password">
+        <input type="text" class="text_title" placeholder="제목을 입력해주세요" name="title" id="title">
+<!--        <input type="text" placeholder="작성자를 입력해주세요" name="writer" id="writer">-->
+<!--        <input type="text" placeholder="비밀번호를 입력해주세요" name="password" id="password">-->
         <textarea class="field" placeholder="공유하고 싶은 소식을 입력해주세요" name="contents" id="contents" cols="30"
                   rows="10"></textarea>
 
-        <img src="images/send.png" alt="" onclick="writePost()">
+        <img src="/images/send.png" alt="" onclick="writePost()">
     </div>
     <div id="cards-box" class="area-read">
         <div class="card">
@@ -555,14 +555,14 @@
                     dsafnkalfklewakflekelafkleajfkleafkldsankflenwaklfnekwlafneklwanfkelawnfkelanfkleanfklew
                 </div>
                 <div id="1-editarea" class="edit">
-                    <textarea id="1-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
+
                 </div>
             </div>
             <!-- 버튼 영역-->
             <div class="footer">
-                <img id="1-edit" onclick="editPost('1')" class="icon-start-edit" src="images/edit.png" alt="">
-                <img id="1-delete" onclick="deleteOne('1')" class="icon-delete" src="images/delete.png" alt="">
-                <img id="1-submit" onclick="submitEdit('1')" class="icon-end-edit" src="images/done.png" alt="">
+                <img id="1-edit" onclick="editPost('1')" class="icon-start-edit" src="/images/edit.png" alt="">
+                <img id="1-delete" onclick="deleteOne('1')" class="icon-delete" src="/images/delete.png" alt="">
+                <img id="1-submit" onclick="submitEdit('1')" class="icon-end-edit" src="/images/done.png" alt="">
             </div>
         </div>
     </div>
@@ -570,3 +570,4 @@
 </body>
 
 </html>
+

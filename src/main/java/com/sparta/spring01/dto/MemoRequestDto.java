@@ -1,6 +1,7 @@
-package com.sparta.spring01.models;
+package com.sparta.spring01.dto;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -16,5 +17,7 @@ public class MemoRequestDto {
     private String contents;
 
     private String password;
+
+    private Long userId;
 
 }

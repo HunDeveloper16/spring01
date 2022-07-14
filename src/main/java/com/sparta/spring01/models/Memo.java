@@ -1,5 +1,6 @@
 package com.sparta.spring01.models;
 
+import com.sparta.spring01.dto.MemoRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,20 +25,20 @@ public class Memo extends Timestamped{
     private String contents;
 
     @Column(nullable = false)
-    private String password;
+    private Long userId;
 
-    public Memo(MemoRequestDto requestDto){
+    public Memo(MemoRequestDto requestDto, Long UserId){
         this.title = requestDto.getTitle();
         this.writer = requestDto.getWriter();
         this.contents = requestDto.getContents();
-        this.password = requestDto.getPassword();
+        this.userId = UserId;
     }
 
-    public void update(MemoRequestDto requestDto){
+    public void update(MemoRequestDto requestDto, Long UserId){
         this.title = requestDto.getTitle();
         this.writer = requestDto.getWriter();
         this.contents = requestDto.getContents();
-        this.password = requestDto.getPassword();
+        this.userId = UserId;
 
     }
 
